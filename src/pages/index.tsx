@@ -1,11 +1,93 @@
 import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
-import styles from '@/styles/Home.module.css'
+import Image from 'next/image';
+import styles from '@/styles/Home.module.css';
+import * as Kalidokit from 'kalidokit';
+import * as THREE from 'three';
+import {useEffect} from 'react';
+import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
+import {VRMLoaderPlugin} from '@pixiv/three-vrm';
+import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
 
-const inter = Inter({ subsets: ['latin'] })
+//Import Helper Functions from Kalidokit
+// const clamp = Kalidokit.Utils.clamp;
+// const lerp = Kalidokit.Vector.lerp;
 
 export default function Home() {
+  // set up three.js once the canvas is loaded
+  useEffect(() => {
+    /* THREEJS WORLD SETUP */
+    let currentVrm;
+    // scene
+    const scene = new THREE.Scene();
+    // camera
+    const orbitCamera = new THREE.PerspectiveCamera(
+      35,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000,
+    );
+    orbitCamera.position.set(0.0, 0.0, 5);
+    // controls
+    const canvas = document.getElementById('myAvatar');
+    const orbitControls = new OrbitControls(orbitCamera, canvas as any);
+    orbitControls.screenSpacePanning = true;
+    orbitControls.target.set(0.0, 1.4, 0.0);
+    // call update method everytime we change the position of the camera
+    orbitControls.update();
+
+    // renderer
+    // An alpha value of 0.0 would result in the object having complete transparency.
+    // When set to true, the value is 0. Otherwise it's 1. Default is false.
+    // {alpha: true}?
+    const renderer = new THREE.WebGLRenderer({canvas: canvas as any});
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    // light
+    const light = new THREE.DirectionalLight(0xffffff);
+    light.position.set(1.0, 1.0, 1.0).normalize();
+    scene.add(light);
+    renderer.setClearColor(0xffea00);
+
+    // Main Render Loop
+    const clock = new THREE.Clock();
+    function animate() {
+      requestAnimationFrame(animate);
+
+      // if (currentVrm) {
+      //   // Update model to render physics
+      //   currentVrm.update(clock.getDelta());
+      // }
+      renderer.render(scene, orbitCamera);
+    }
+    animate();
+    /* VRM CHARACTER SETUP */
+    // Import Character VRM
+    const loader = new GLTFLoader();
+    loader.crossOrigin = 'anonymous';
+    // install plugin
+    loader.register(parser => {
+      return new VRMLoaderPlugin(parser);
+    });
+    // Import model from URL, add your own model here
+    loader.load(
+      'https://cdn.glitch.com/29e07830-2317-4b15-a044-135e73c7f840%2FAshtra.vrm?v=1630342336981',
+
+      gltf => {
+        // THREE.VRMUtils.removeUnnecessaryJoints(gltf.scene);
+        const vrm = gltf.userData.vrm;
+        // THREE.VRM.from(gltf).then(vrm => {
+        scene.add(vrm.scene);
+        console.log(vrm);
+        currentVrm = vrm;
+        currentVrm.scene.rotation.y = Math.PI; // Rotate model 180deg to face camera
+        // });
+      },
+
+      progress => console.log('Loading model...', 100.0 * (progress.loaded / progress.total), '%'),
+      // undefined,
+      error => console.error(error),
+    );
+  }, []);
   return (
     <>
       <Head>
@@ -14,101 +96,9 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={`${styles.main} ${inter.className}`}>
-        <div className={styles.description}>
-          <p>
-            Get started by editing&nbsp;
-            <code className={styles.code}>src/pages/index.tsx</code>
-          </p>
-          <div>
-            <a
-              href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              By{' '}
-              <Image
-                src="/vercel.svg"
-                alt="Vercel Logo"
-                className={styles.vercelLogo}
-                width={100}
-                height={24}
-                priority
-              />
-            </a>
-          </div>
-        </div>
-
-        <div className={styles.center}>
-          <Image
-            className={styles.logo}
-            src="/next.svg"
-            alt="Next.js Logo"
-            width={180}
-            height={37}
-            priority
-          />
-        </div>
-
-        <div className={styles.grid}>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2>
-              Docs <span>-&gt;</span>
-            </h2>
-            <p>
-              Find in-depth information about Next.js features and&nbsp;API.
-            </p>
-          </a>
-
-          <a
-            href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2>
-              Learn <span>-&gt;</span>
-            </h2>
-            <p>
-              Learn about Next.js in an interactive course with&nbsp;quizzes!
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2>
-              Templates <span>-&gt;</span>
-            </h2>
-            <p>
-              Discover and deploy boilerplate example Next.js&nbsp;projects.
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2>
-              Deploy <span>-&gt;</span>
-            </h2>
-            <p>
-              Instantly deploy your Next.js site to a shareable URL
-              with&nbsp;Vercel.
-            </p>
-          </a>
-        </div>
+      <main className={`${styles.main}`}>
+        <canvas id="myAvatar" className={`${styles.myAvatar}`} />
       </main>
     </>
-  )
+  );
 }
