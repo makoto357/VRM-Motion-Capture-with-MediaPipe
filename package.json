@@ -9,7 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@mediapipe/camera_utils": "^0.3.1675466862",
+    "@mediapipe/drawing_utils": "^0.3.1675466124",
+    "@mediapipe/holistic": "0.5.1635989137",
     "@pixiv/three-vrm": "^1.0.10",
+    "@pixiv/types-vrmc-vrm-1.0": "^1.0.0",
     "@types/node": "20.2.5",
     "@types/react": "18.2.9",
     "@types/react-dom": "18.2.4",
