@@ -3,7 +3,13 @@ import {useEffect} from 'react';
 import * as THREE from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
-import {VRMExpressionPresetName, VRMLoaderPlugin, VRMUtils} from '@pixiv/three-vrm';
+import {
+  VRM,
+  VRMExpressionPresetName,
+  VRMHumanBoneName,
+  VRMLoaderPlugin,
+  VRMUtils,
+} from '@pixiv/three-vrm';
 import type * as V1VRMSchema from '@pixiv/types-vrmc-vrm-1.0';
 import * as Kalidokit from 'kalidokit';
 import {
@@ -11,11 +17,19 @@ import {
   HAND_CONNECTIONS,
   Holistic,
   POSE_CONNECTIONS,
+  ResultsListener,
 } from '@mediapipe/holistic';
 import {Camera} from '@mediapipe/camera_utils';
 import {drawConnectors, drawLandmarks, NormalizedLandmarkList} from '@mediapipe/drawing_utils';
 //Import Helper Functions from Kalidokit
-const remap = Kalidokit.Utils.remap;
+interface HolisticResults {
+  poseLandmarks?: NormalizedLandmarkList;
+  faceLandmarks?: NormalizedLandmarkList;
+  leftHandLandmarks?: NormalizedLandmarkList;
+  rightHandLandmarks?: NormalizedLandmarkList;
+  ea?: NormalizedLandmarkList;
+}
+
 const clamp = Kalidokit.Utils.clamp;
 const lerp = Kalidokit.Vector.lerp;
 
@@ -35,8 +49,8 @@ export default function KalidoCanvas() {
     );
     orbitCamera.position.set(0.0, 0.0, 5);
     // controls
-    const canvas = document.getElementById('myAvatar');
-    const orbitControls = new OrbitControls(orbitCamera, canvas as any);
+    const canvas = document.getElementById('myAvatar') as HTMLElement;
+    const orbitControls = new OrbitControls(orbitCamera, canvas);
     orbitControls.screenSpacePanning = true;
     orbitControls.target.set(0.0, 1.4, 0.0);
     // call update method everytime we change the position of the camera
@@ -46,7 +60,7 @@ export default function KalidoCanvas() {
     // An alpha value of 0.0 would result in the object having complete transparency.
     // When set to true, the value is 0. Otherwise it's 1. Default is false.
     // {alpha: true}?
-    const renderer = new THREE.WebGLRenderer({canvas: canvas as any});
+    const renderer = new THREE.WebGLRenderer({canvas});
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
     // light
@@ -95,7 +109,7 @@ export default function KalidoCanvas() {
     );
     // Animate Rotation Helper function
     const rigRotation = (
-      name: string,
+      name: VRMHumanBoneName,
       rotation = {x: 0, y: 0, z: 0},
       dampener = 1,
       lerpAmount = 0.3,
@@ -119,7 +133,7 @@ export default function KalidoCanvas() {
 
     // Animate Position Helper Function
     const rigPosition = (
-      name: string,
+      name: VRMHumanBoneName,
       position = {x: 0, y: 0, z: 0},
       dampener = 1,
       lerpAmount = 0.3,
@@ -140,7 +154,7 @@ export default function KalidoCanvas() {
     };
 
     let oldLookTarget = new THREE.Euler();
-    const rigFace = (riggedFace: any) => {
+    const rigFace = (riggedFace: Kalidokit.TFace) => {
       if (!currentVrm) {
         return;
       }
@@ -199,16 +213,7 @@ export default function KalidoCanvas() {
     };
 
     /* VRM Character Animator */
-    const animateVRM = (
-      vrm: any,
-      results: {
-        faceLandmarks: any;
-        ea: any;
-        poseLandmarks: any;
-        rightHandLandmarks: any;
-        leftHandLandmarks: any;
-      },
-    ) => {
+    const animateVRM = (vrm: VRM, results: any) => {
       if (!vrm) {
         return;
       }
@@ -233,7 +238,9 @@ export default function KalidoCanvas() {
           runtime: 'mediapipe',
           video: videoElement,
         });
-        rigFace(riggedFace);
+        if (riggedFace) {
+          rigFace(riggedFace);
+        }
       }
 
       // Animate Pose
@@ -290,7 +297,6 @@ export default function KalidoCanvas() {
           rigRotation('leftMiddleIntermediate', riggedLeftHand.LeftMiddleIntermediate);
           rigRotation('leftMiddleDistal', riggedLeftHand.LeftMiddleDistal);
           rigRotation('leftThumbProximal', riggedLeftHand.LeftThumbProximal);
-          rigRotation('leftThumbIntermediate', riggedLeftHand.LeftThumbIntermediate);
           rigRotation('leftThumbDistal', riggedLeftHand.LeftThumbDistal);
           rigRotation('leftLittleProximal', riggedLeftHand.LeftLittleProximal);
           rigRotation('leftLittleIntermediate', riggedLeftHand.LeftLittleIntermediate);
@@ -316,7 +322,6 @@ export default function KalidoCanvas() {
           rigRotation('rightMiddleIntermediate', riggedRightHand.RightMiddleIntermediate);
           rigRotation('rightMiddleDistal', riggedRightHand.RightMiddleDistal);
           rigRotation('rightThumbProximal', riggedRightHand.RightThumbProximal);
-          rigRotation('rightThumbIntermediate', riggedRightHand.RightThumbIntermediate);
           rigRotation('rightThumbDistal', riggedRightHand.RightThumbDistal);
           rigRotation('rightLittleProximal', riggedRightHand.RightLittleProximal);
           rigRotation('rightLittleIntermediate', riggedRightHand.RightLittleIntermediate);
@@ -328,7 +333,7 @@ export default function KalidoCanvas() {
     let videoElement = document.querySelector('.input_video') as HTMLVideoElement;
     let guideCanvas = document.querySelector('canvas.guides') as HTMLCanvasElement;
 
-    const onResults = (results: any) => {
+    const onResults = (results: HolisticResults) => {
       console.log(results);
       drawResults(results);
       // Animate model
@@ -348,14 +353,9 @@ export default function KalidoCanvas() {
       refineFaceLandmarks: true,
     });
     // Pass holistic a callback function
-    holistic.onResults(onResults);
+    holistic.onResults(onResults as ResultsListener);
 
-    const drawResults = (results: {
-      poseLandmarks: NormalizedLandmarkList | undefined;
-      faceLandmarks: NormalizedLandmarkList | undefined;
-      leftHandLandmarks: NormalizedLandmarkList | undefined;
-      rightHandLandmarks: NormalizedLandmarkList | undefined;
-    }) => {
+    const drawResults = (results: HolisticResults) => {
       guideCanvas.width = videoElement.videoWidth;
       guideCanvas.height = videoElement.videoHeight;
       let canvasCtx = guideCanvas.getContext('2d');
@@ -402,9 +402,9 @@ export default function KalidoCanvas() {
     };
 
     // Use `Mediapipe` utils to get camera - lower resolution = higher fps
-    const camera = new Camera(videoElement as HTMLVideoElement, {
+    const camera = new Camera(videoElement, {
       onFrame: async () => {
-        await holistic.send({image: videoElement as HTMLVideoElement});
+        await holistic.send({image: videoElement});
       },
       width: 640,
       height: 480,
