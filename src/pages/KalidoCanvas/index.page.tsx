@@ -413,16 +413,16 @@ export default function KalidoCanvas() {
   }, []);
   return (
     <div className={`${styles.scene}`}>
-      <div>
+      <div className={`${styles.preview}`}>
         <video
-          className="input_video"
+          className={`${styles.video} input_video`}
           width="1280px"
           height="720px"
           autoPlay
           muted
           playsInline
         ></video>
-        <canvas className="guides" />
+        <canvas className={`${styles.guide_canvas} guides`} />
       </div>
       <canvas id="myAvatar" />
     </div>
