@@ -82,12 +82,11 @@ export default function KalidoCanvas() {
       gltf => {
         VRMUtils.removeUnnecessaryJoints(gltf.scene);
         const vrm = gltf.userData.vrm;
-        // THREE.VRM.from(gltf).then(vrm => {
         scene.add(vrm.scene);
         console.log(vrm);
         currentVrm = vrm;
-        currentVrm.scene.rotation.y = Math.PI; // Rotate model 180deg to face camera
-        // });
+        VRMUtils.rotateVRM0(currentVrm); // Rotate model 180deg to face camera
+        return currentVrm;
       },
 
       progress => console.log('Loading model...', 100.0 * (progress.loaded / progress.total), '%'),
@@ -105,7 +104,6 @@ export default function KalidoCanvas() {
         return;
       }
       const Part = currentVrm.humanoid.getNormalizedBoneNode(name);
-      console.log(Part);
       if (!Part) {
         return;
       }
@@ -146,8 +144,7 @@ export default function KalidoCanvas() {
       if (!currentVrm) {
         return;
       }
-      rigRotation('neck', riggedFace.head, 0.7);
-      console.log(riggedFace.head);
+      rigRotation('neck', riggedFace.head, -0.7);
 
       // Blendshapes and Preset Name Schema
       const Blendshape = currentVrm.expressionManager;
@@ -258,13 +255,13 @@ export default function KalidoCanvas() {
             0.07,
           );
 
-          rigRotation('chest', riggedPose.Spine, 0.25, 0.3);
-          rigRotation('spine', riggedPose.Spine, 0.45, 0.3);
+          rigRotation('chest', riggedPose.Spine, -0.25, 0.3);
+          rigRotation('spine', riggedPose.Spine, -0.45, 0.3);
 
-          rigRotation('rightUpperArm', riggedPose.RightUpperArm, 1, 0.3);
-          rigRotation('rightLowerArm', riggedPose.RightLowerArm, 1, 0.3);
-          rigRotation('leftUpperArm', riggedPose.LeftUpperArm, 1, 0.3);
-          rigRotation('leftLowerArm', riggedPose.LeftLowerArm, 1, 0.3);
+          rigRotation('leftUpperArm', riggedPose.RightUpperArm, -1, 0.3);
+          rigRotation('leftLowerArm', riggedPose.RightLowerArm, -1, 0.3);
+          rigRotation('rightUpperArm', riggedPose.LeftUpperArm, -1, 0.3);
+          rigRotation('rightLowerArm', riggedPose.LeftLowerArm, -1, 0.3);
 
           rigRotation('leftUpperLeg', riggedPose.LeftUpperLeg, 1, 0.3);
           rigRotation('leftLowerLeg', riggedPose.LeftLowerLeg, 1, 0.3);
@@ -276,7 +273,6 @@ export default function KalidoCanvas() {
       // Animate Hands
       if (leftHandLandmarks) {
         riggedLeftHand = Kalidokit.Hand.solve(leftHandLandmarks, 'Left');
-        console.log('lefthand');
         if (riggedLeftHand && riggedPose) {
           rigRotation('leftHand', {
             // Combine pose rotation Z and hand rotation X Y
@@ -303,9 +299,7 @@ export default function KalidoCanvas() {
       }
       if (rightHandLandmarks) {
         riggedRightHand = Kalidokit.Hand.solve(rightHandLandmarks, 'Right');
-        rigRotation('rightHand');
         if (riggedRightHand && riggedPose) {
-          console.log(riggedRightHand);
           rigRotation('rightHand', {
             // Combine Z axis from pose hand and X/Y axis from hand wrist rotation
             z: riggedPose.RightHand.z,
@@ -336,7 +330,7 @@ export default function KalidoCanvas() {
 
     const onResults = (results: any) => {
       console.log(results);
-      // drawResults(results);
+      drawResults(results);
       // Animate model
       animateVRM(currentVrm, results);
     };
@@ -362,9 +356,9 @@ export default function KalidoCanvas() {
       leftHandLandmarks: NormalizedLandmarkList | undefined;
       rightHandLandmarks: NormalizedLandmarkList | undefined;
     }) => {
-      // guideCanvas.width = videoElement.videoWidth;
-      // guideCanvas.height = videoElement.videoHeight;
-      let canvasCtx = guideCanvas.getContext('2d') as CanvasRenderingContext2D;
+      guideCanvas.width = videoElement.videoWidth;
+      guideCanvas.height = videoElement.videoHeight;
+      let canvasCtx = guideCanvas.getContext('2d');
       if (canvasCtx) {
         canvasCtx.save();
         canvasCtx.clearRect(0, 0, guideCanvas.width, guideCanvas.height);
@@ -419,15 +413,18 @@ export default function KalidoCanvas() {
   }, []);
   return (
     <div className={`${styles.scene}`}>
-      <video
-        className="input_video"
-        width="1280px"
-        height="720px"
-        autoPlay
-        muted
-        playsInline
-      ></video>
-      <canvas id="myAvatar" className="guides" />
+      <div>
+        <video
+          className="input_video"
+          width="1280px"
+          height="720px"
+          autoPlay
+          muted
+          playsInline
+        ></video>
+        <canvas className="guides" />
+      </div>
+      <canvas id="myAvatar" />
     </div>
   );
 }
