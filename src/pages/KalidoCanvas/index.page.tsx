@@ -10,7 +10,6 @@ import {
   VRMLoaderPlugin,
   VRMUtils,
 } from '@pixiv/three-vrm';
-import type * as V1VRMSchema from '@pixiv/types-vrmc-vrm-1.0';
 import * as Kalidokit from 'kalidokit';
 import {
   FACEMESH_TESSELATION,
@@ -21,7 +20,6 @@ import {
 } from '@mediapipe/holistic';
 import {Camera} from '@mediapipe/camera_utils';
 import {drawConnectors, drawLandmarks, NormalizedLandmarkList} from '@mediapipe/drawing_utils';
-//Import Helper Functions from Kalidokit
 interface HolisticResults {
   poseLandmarks?: NormalizedLandmarkList;
   faceLandmarks?: NormalizedLandmarkList;
@@ -30,6 +28,7 @@ interface HolisticResults {
   ea?: NormalizedLandmarkList;
 }
 
+//Import Helper Functions from Kalidokit
 const clamp = Kalidokit.Utils.clamp;
 const lerp = Kalidokit.Vector.lerp;
 
@@ -92,7 +91,8 @@ export default function KalidoCanvas() {
     // Import model from URL, add your own model here
     loader.load(
       'https://cdn.glitch.com/29e07830-2317-4b15-a044-135e73c7f840%2FAshtra.vrm?v=1630342336981',
-
+      // '/avatar_vrm_61933_1685588103.vrm',
+      // '/9181659709465535900.vrm',
       gltf => {
         VRMUtils.removeUnnecessaryJoints(gltf.scene);
         const vrm = gltf.userData.vrm;
@@ -158,7 +158,7 @@ export default function KalidoCanvas() {
       if (!currentVrm) {
         return;
       }
-      rigRotation('neck', riggedFace.head, -0.7);
+      rigRotation('neck', riggedFace.head, 0.7);
 
       // Blendshapes and Preset Name Schema
       const Blendshape = currentVrm.expressionManager;
@@ -228,8 +228,8 @@ export default function KalidoCanvas() {
       // Pose 2D landmarks are with respect to videoWidth and videoHeight
       const pose2DLandmarks = results.poseLandmarks;
       // Be careful, hand landmarks may be reversed
-      const leftHandLandmarks = results.leftHandLandmarks;
-      const rightHandLandmarks = results.rightHandLandmarks;
+      const leftHandLandmarks = results.rightHandLandmarks;
+      const rightHandLandmarks = results.leftHandLandmarks;
 
       // Animate Face
 
@@ -262,13 +262,13 @@ export default function KalidoCanvas() {
             0.07,
           );
 
-          rigRotation('chest', riggedPose.Spine, -0.25, 0.3);
-          rigRotation('spine', riggedPose.Spine, -0.45, 0.3);
+          rigRotation('chest', riggedPose.Spine, 0.25, 0.3);
+          rigRotation('spine', riggedPose.Spine, 0.45, 0.3);
 
-          rigRotation('leftUpperArm', riggedPose.RightUpperArm, -1, 0.3);
-          rigRotation('leftLowerArm', riggedPose.RightLowerArm, -1, 0.3);
-          rigRotation('rightUpperArm', riggedPose.LeftUpperArm, -1, 0.3);
-          rigRotation('rightLowerArm', riggedPose.LeftLowerArm, -1, 0.3);
+          rigRotation('leftUpperArm', riggedPose.LeftUpperArm, 1, 0.3);
+          rigRotation('leftLowerArm', riggedPose.LeftLowerArm, 1, 0.3);
+          rigRotation('rightUpperArm', riggedPose.RightUpperArm, 1, 0.3);
+          rigRotation('rightLowerArm', riggedPose.RightLowerArm, 1, 0.3);
 
           rigRotation('leftUpperLeg', riggedPose.LeftUpperLeg, 1, 0.3);
           rigRotation('leftLowerLeg', riggedPose.LeftLowerLeg, 1, 0.3);
