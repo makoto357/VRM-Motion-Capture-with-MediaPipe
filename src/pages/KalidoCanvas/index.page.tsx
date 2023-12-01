@@ -20,6 +20,9 @@ import {
 } from '@mediapipe/holistic';
 import {Camera} from '@mediapipe/camera_utils';
 import {drawConnectors, drawLandmarks, NormalizedLandmarkList} from '@mediapipe/drawing_utils';
+import {useDrag} from '@use-gesture/react';
+import {useSpring, animated} from '@react-spring/web';
+
 interface HolisticResults {
   poseLandmarks?: NormalizedLandmarkList;
   faceLandmarks?: NormalizedLandmarkList;
@@ -33,6 +36,17 @@ const clamp = Kalidokit.Utils.clamp;
 const lerp = Kalidokit.Vector.lerp;
 
 export default function KalidoCanvas() {
+  const [{x, y}, api] = useSpring(() => ({
+    x: 0,
+    y: 0,
+    config: {mass: 1, tension: 350, friction: 40},
+  }));
+  const bindDrag = useDrag(({offset}) => {
+    api({
+      x: offset[0],
+      y: offset[1],
+    });
+  });
   // set up three.js once the canvas is loaded
   useEffect(() => {
     /* THREEJS WORLD SETUP */
@@ -67,6 +81,8 @@ export default function KalidoCanvas() {
     light.position.set(1.0, 1.0, 1.0).normalize();
     scene.add(light);
     // renderer.setClearColor(0xffea00);
+    const textureLoader = new THREE.TextureLoader();
+    scene.background = textureLoader.load('/green-grass-field.jpg');
 
     // Main Render Loop
     const clock = new THREE.Clock();
@@ -413,17 +429,23 @@ export default function KalidoCanvas() {
   }, []);
   return (
     <div className={`${styles.scene}`}>
-      <div className={`${styles.preview}`}>
-        <video
-          className={`${styles.video} input_video`}
-          width="1280px"
-          height="720px"
-          autoPlay
-          muted
-          playsInline
-        ></video>
-        <canvas className={`${styles.guide_canvas} guides`} />
-      </div>
+      <animated.div
+        className={`${styles.draggableVideo}`}
+        style={{x, y, ...styles}}
+        {...bindDrag()}
+      >
+        <div className={`${styles.preview}`}>
+          <video
+            className={`${styles.video} input_video`}
+            width="1280px"
+            height="720px"
+            autoPlay
+            muted
+            playsInline
+          ></video>
+          <canvas className={`${styles.guide_canvas} guides`} />
+        </div>
+      </animated.div>
       <canvas id="myAvatar" />
     </div>
   );
