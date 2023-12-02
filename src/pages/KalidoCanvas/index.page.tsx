@@ -36,9 +36,11 @@ const clamp = Kalidokit.Utils.clamp;
 const lerp = Kalidokit.Vector.lerp;
 
 export default function KalidoCanvas() {
+  const [cameraIsOn, setCameraIsOn] = useState(false);
   const [isDayTheme, setisDayTheme] = useState(true);
-  const avatarBgImage = isDayTheme ? 'green-grass-field.jpg' : '/stars.jpg';
-  const buttonBgImage = isDayTheme ? '/stars.jpg' : 'green-grass-field.jpg';
+  const avatarBgImage = isDayTheme ? '/green-grass-field.jpg' : '/galaxy.jpg';
+  const avatarBgImageButton = isDayTheme ? '/galaxy.jpg' : '/green-grass-field.jpg';
+  const cameraBgImageButton = cameraIsOn ? 'camera-off.svg' : 'camera-on.svg';
 
   // make video draggeble
   const [{x, y}, api] = useSpring(() => ({
@@ -429,31 +431,41 @@ export default function KalidoCanvas() {
       width: 640,
       height: 480,
     });
-    camera.start();
-  }, [avatarBgImage]);
+
+    if (cameraIsOn) {
+      camera.start();
+      return () => {
+        camera.stop();
+      };
+    } else {
+      camera.stop();
+    }
+  }, [avatarBgImage, cameraIsOn]);
 
   return (
     <div className={`${styles.scene}`}>
-      <animated.div
-        className={`${styles.draggableVideo}`}
-        style={{x, y, ...styles}}
-        {...bindDrag()}
-      >
-        <div className={`${styles.preview}`}>
-          <video
-            className={`${styles.video} input_video`}
-            width="1280px"
-            height="720px"
-            autoPlay
-            muted
-            playsInline
-          ></video>
-          <canvas className={`${styles.guide_canvas} guides`} />
-        </div>
-      </animated.div>
+      {cameraIsOn && (
+        <animated.div
+          className={`${styles.draggableVideo}`}
+          style={{x, y, ...styles}}
+          {...bindDrag()}
+        >
+          <div className={`${styles.preview}`}>
+            <video
+              className={`${styles.video} input_video`}
+              width="1280px"
+              height="720px"
+              autoPlay
+              muted
+              playsInline
+            ></video>
+            <canvas className={`${styles.guide_canvas} guides`} />
+          </div>
+        </animated.div>
+      )}
       <button
         className={styles.c_button}
-        style={{bottom: '48px', right: '48px', backgroundImage: `url(${buttonBgImage})`}}
+        style={{bottom: '48px', right: '48px', backgroundImage: `url(${avatarBgImageButton})`}}
         onClick={() => setisDayTheme(prev => !prev)}
       ></button>
       <button
@@ -462,9 +474,10 @@ export default function KalidoCanvas() {
           bottom: '48px',
           right: '128px',
         }}
+        onClick={() => setCameraIsOn(prev => !prev)}
       >
         <img
-          src={buttonBgImage}
+          src={cameraBgImageButton}
           style={{
             width: '30px',
             height: '30px',
