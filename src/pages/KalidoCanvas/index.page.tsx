@@ -1,5 +1,5 @@
 import styles from '@/styles/Home.module.css';
-import {useEffect} from 'react';
+import {useState, useEffect} from 'react';
 import * as THREE from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -36,6 +36,11 @@ const clamp = Kalidokit.Utils.clamp;
 const lerp = Kalidokit.Vector.lerp;
 
 export default function KalidoCanvas() {
+  const [isDayTheme, setisDayTheme] = useState(true);
+  const avatarBgImage = isDayTheme ? 'green-grass-field.jpg' : '/stars.jpg';
+  const buttonBgImage = isDayTheme ? '/stars.jpg' : 'green-grass-field.jpg';
+
+  // make video draggeble
   const [{x, y}, api] = useSpring(() => ({
     x: 0,
     y: 0,
@@ -47,6 +52,7 @@ export default function KalidoCanvas() {
       y: offset[1],
     });
   });
+
   // set up three.js once the canvas is loaded
   useEffect(() => {
     /* THREEJS WORLD SETUP */
@@ -82,7 +88,7 @@ export default function KalidoCanvas() {
     scene.add(light);
     // renderer.setClearColor(0xffea00);
     const textureLoader = new THREE.TextureLoader();
-    scene.background = textureLoader.load('/green-grass-field.jpg');
+    scene.background = textureLoader.load(avatarBgImage);
 
     // Main Render Loop
     const clock = new THREE.Clock();
@@ -96,6 +102,7 @@ export default function KalidoCanvas() {
       renderer.render(scene, orbitCamera);
     }
     animate();
+
     /* VRM CHARACTER SETUP */
     // Import Character VRM
     const loader = new GLTFLoader();
@@ -107,8 +114,6 @@ export default function KalidoCanvas() {
     // Import model from URL, add your own model here
     loader.load(
       'https://cdn.glitch.com/29e07830-2317-4b15-a044-135e73c7f840%2FAshtra.vrm?v=1630342336981',
-      // '/avatar_vrm_61933_1685588103.vrm',
-      // '/9181659709465535900.vrm',
       gltf => {
         VRMUtils.removeUnnecessaryJoints(gltf.scene);
         const vrm = gltf.userData.vrm;
@@ -120,9 +125,9 @@ export default function KalidoCanvas() {
       },
 
       progress => console.log('Loading model...', 100.0 * (progress.loaded / progress.total), '%'),
-      // undefined,
       error => console.error(error),
     );
+
     // Animate Rotation Helper function
     const rigRotation = (
       name: VRMHumanBoneName,
@@ -234,7 +239,6 @@ export default function KalidoCanvas() {
         return;
       }
 
-      //
       // Take the results from `Holistic` and animate character based on its Face, Pose, and Hand Keypoints.
       let riggedPose, riggedLeftHand, riggedRightHand, riggedFace;
 
@@ -248,7 +252,6 @@ export default function KalidoCanvas() {
       const rightHandLandmarks = results.leftHandLandmarks;
 
       // Animate Face
-
       if (faceLandmarks) {
         riggedFace = Kalidokit.Face.solve(faceLandmarks, {
           runtime: 'mediapipe',
@@ -345,6 +348,7 @@ export default function KalidoCanvas() {
         }
       }
     };
+
     /* SETUP MEDIAPIPE HOLISTIC INSTANCE */
     let videoElement = document.querySelector('.input_video') as HTMLVideoElement;
     let guideCanvas = document.querySelector('canvas.guides') as HTMLCanvasElement;
@@ -426,7 +430,8 @@ export default function KalidoCanvas() {
       height: 480,
     });
     camera.start();
-  }, []);
+  }, [avatarBgImage]);
+
   return (
     <div className={`${styles.scene}`}>
       <animated.div
@@ -446,6 +451,27 @@ export default function KalidoCanvas() {
           <canvas className={`${styles.guide_canvas} guides`} />
         </div>
       </animated.div>
+      <button
+        className={styles.c_button}
+        style={{bottom: '48px', right: '48px', backgroundImage: `url(${buttonBgImage})`}}
+        onClick={() => setisDayTheme(prev => !prev)}
+      ></button>
+      <button
+        className={styles.c_button}
+        style={{
+          bottom: '48px',
+          right: '128px',
+        }}
+      >
+        <img
+          src={buttonBgImage}
+          style={{
+            width: '30px',
+            height: '30px',
+          }}
+        />
+      </button>
+
       <canvas id="myAvatar" />
     </div>
   );
