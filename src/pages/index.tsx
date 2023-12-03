@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import dynamic from 'next/dynamic';
-const KalidoCanvas = dynamic(() => import('./KalidoCanvas/index.page'), {ssr: false});
+const KalidoCanvas = dynamic(() => import('../components/KalidoCanvas/index.page'), {ssr: false});
 
 export default function Home() {
   return (
