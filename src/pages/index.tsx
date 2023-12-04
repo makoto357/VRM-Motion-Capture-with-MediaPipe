@@ -1,4 +1,4 @@
-import styles from './Home.module.css';
+import {Box} from '@chakra-ui/react';
 import Head from 'next/head';
 import dynamic from 'next/dynamic';
 import {useState, useEffect} from 'react';
@@ -45,8 +45,17 @@ export default function Home() {
       </Head>
       <main>
         {!currentVrm ? (
-          <div className={`${styles.cover}`}>
-            <div className={`${styles.circularProgressbar}`}>
+          <Box
+            bgImage="url('/website-background-cover.png')"
+            backgroundSize="cover"
+            backgroundPosition="center"
+            display="flex"
+            justifyContent="center"
+            alignItems="flex-end"
+            h="100vh"
+            w="100%"
+          >
+            <Box w="150px" h="150px" mb="50px">
               <CircularProgressbar
                 value={progress}
                 text={`${progress}%`}
@@ -67,8 +76,8 @@ export default function Home() {
                   },
                 }}
               />
-            </div>
-          </div>
+            </Box>
+          </Box>
         ) : (
           <KalidoCanvas currentVrm={currentVrm} />
         )}

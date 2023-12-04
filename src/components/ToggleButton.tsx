@@ -1,4 +1,5 @@
 import styles from './ToggleButton.module.css';
+import {Box, Image} from '@chakra-ui/react';
 
 interface ToggleButtonProps {
   onClickButton: () => void;
@@ -23,7 +24,11 @@ const ToggleButton: React.FC<ToggleButtonProps> = ({
       }}
       onClick={onClickButton}
     >
-      {bgImageSrc && <img className={styles.c_button_image} src={bgImageSrc} />}
+      {bgImageSrc && (
+        <Box p="5px">
+          <Image src={bgImageSrc} w="30px" h="30px" />
+        </Box>
+      )}
     </button>
   );
 };
