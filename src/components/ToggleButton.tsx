@@ -18,6 +18,7 @@ const ToggleButton: React.FC<ToggleButtonProps> = ({
       className={styles.c_button}
       style={{
         right: `${buttonRightPosition}`,
+        bottom: '48px',
         backgroundImage: `url(${bgImageUrl})`,
       }}
       onClick={onClickButton}

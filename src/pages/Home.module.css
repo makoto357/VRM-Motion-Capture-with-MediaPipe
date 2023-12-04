@@ -1,0 +1,16 @@
+.cover {
+  background-image: url('/website-background-cover.png');
+  background-size: cover;
+  background-position: center; /* Center the background image */
+  display: flex;
+  justify-content: center;
+  align-items: end;
+  height: 100vh;
+  width: 100%;
+}
+
+.circularProgressbar {
+  width: 150px;
+  height: 150px;
+  margin-bottom: 50px;
+}

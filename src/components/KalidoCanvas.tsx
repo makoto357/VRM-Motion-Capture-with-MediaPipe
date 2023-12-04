@@ -34,7 +34,7 @@ export default function KalidoCanvas({currentVrm}: any) {
   const [isDayTheme, setisDayTheme] = useState(true);
   const avatarBgImage = isDayTheme ? '/green-grass-field.jpg' : '/galaxy.jpg';
   const avatarBgImageButton = isDayTheme ? '/galaxy.jpg' : '/green-grass-field.jpg';
-  const cameraBgImageButton = cameraIsOn ? 'camera-off.svg' : 'camera-on.svg';
+  const cameraBgImageButton = cameraIsOn ? '/camera-off.svg' : '/camera-on.svg';
 
   // make video draggable
   const [{x, y}, api] = useSpring(() => ({
