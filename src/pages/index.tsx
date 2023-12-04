@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic';
 import {useState, useEffect} from 'react';
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
 import {VRMLoaderPlugin, VRMUtils} from '@pixiv/three-vrm';
-const KalidoCanvas = dynamic(() => import('../components/KalidoCanvas/index.page'), {ssr: false});
+const KalidoCanvas = dynamic(() => import('../components/KalidoCanvas'), {ssr: false});
 
 export default function Home() {
   const [currentVrm, setCurrentVrm] = useState(null);

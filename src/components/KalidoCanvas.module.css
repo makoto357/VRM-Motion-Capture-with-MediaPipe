@@ -1,0 +1,48 @@
+.scene{
+  position: relative;
+  display: flex;
+  flex-direction: row;
+}
+
+.preview {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #222;
+  z-index: 200;
+}
+
+.draggableVideo {
+  position: relative;
+  will-change: transform;
+  border-radius: 20px;
+  touch-action: none;
+  cursor: grab;
+}
+
+.video {
+  max-width: 400px;
+  height: auto;
+  transform: scale(-1, 1);
+  border-radius: 20px;
+}
+
+.guide_canvas {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: auto;
+  width: 100%;
+  z-index: 1;
+  transform: scale(-1, 1);
+}
+
+@media only screen and (max-width: 600px) {
+  .video {
+      max-width: 160px;
+  }
+}

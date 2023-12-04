@@ -1,4 +1,4 @@
-import styles from '@/styles/Home.module.css';
+import styles from './KalidoCanvas.module.css';
 import {useState, useEffect} from 'react';
 import * as THREE from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
@@ -15,6 +15,7 @@ import {Camera} from '@mediapipe/camera_utils';
 import {drawConnectors, drawLandmarks, NormalizedLandmarkList} from '@mediapipe/drawing_utils';
 import {useDrag} from '@use-gesture/react';
 import {useSpring, animated} from '@react-spring/web';
+import ToggleButton from './ToggleButton';
 
 interface HolisticResults {
   poseLandmarks?: NormalizedLandmarkList;
@@ -35,7 +36,7 @@ export default function KalidoCanvas({currentVrm}: any) {
   const avatarBgImageButton = isDayTheme ? '/galaxy.jpg' : '/green-grass-field.jpg';
   const cameraBgImageButton = cameraIsOn ? 'camera-off.svg' : 'camera-on.svg';
 
-  // make video draggeble
+  // make video draggable
   const [{x, y}, api] = useSpring(() => ({
     x: 0,
     y: 0,
@@ -91,7 +92,6 @@ export default function KalidoCanvas({currentVrm}: any) {
     const clock = new THREE.Clock();
     function animate() {
       requestAnimationFrame(animate);
-
       if (currentVrm) {
         // Update model to render physics
         currentVrm.update(clock.getDelta());
@@ -111,7 +111,6 @@ export default function KalidoCanvas({currentVrm}: any) {
       if (!Part) {
         return;
       }
-
       let euler = new THREE.Euler(
         rotation.x * dampener,
         rotation.y * dampener,
@@ -204,7 +203,6 @@ export default function KalidoCanvas({currentVrm}: any) {
 
       // Take the results from `Holistic` and animate character based on its Face, Pose, and Hand Keypoints.
       let riggedPose, riggedLeftHand, riggedRightHand, riggedFace;
-
       const faceLandmarks = results.faceLandmarks;
       // Pose 3D Landmarks are with respect to Hip distance in meters
       const pose3DLandmarks = results.ea;
@@ -322,6 +320,7 @@ export default function KalidoCanvas({currentVrm}: any) {
       // Animate model
       animateVRM(currentVrm, results);
     };
+
     const holistic = new Holistic({
       locateFile: file => {
         return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.5.1635989137/${file}`;
@@ -424,28 +423,24 @@ export default function KalidoCanvas({currentVrm}: any) {
           </div>
         </animated.div>
       )}
-      <button
-        className={styles.c_button}
-        style={{bottom: '48px', right: '48px', backgroundImage: `url(${avatarBgImageButton})`}}
-        onClick={() => setisDayTheme(prev => !prev)}
-      ></button>
-      <button
-        className={styles.c_button}
-        style={{
-          bottom: '48px',
-          right: '128px',
-        }}
-        onClick={() => setCameraIsOn(prev => !prev)}
-      >
-        <img
-          src={cameraBgImageButton}
-          style={{
-            width: '30px',
-            height: '30px',
-          }}
-        />
-      </button>
-
+      <ToggleButton
+        onClickButton={() => setisDayTheme(prev => !prev)}
+        buttonRightPosition="48px"
+        bgImageSrc=""
+        bgImageUrl={avatarBgImageButton}
+      />
+      <ToggleButton
+        onClickButton={() => setisDayTheme(prev => !prev)}
+        buttonRightPosition="128px"
+        bgImageSrc=""
+        bgImageUrl={avatarBgImageButton}
+      />
+      <ToggleButton
+        onClickButton={() => setCameraIsOn(prev => !prev)}
+        buttonRightPosition="208px"
+        bgImageSrc={cameraBgImageButton}
+        bgImageUrl=""
+      />
       <canvas id="myAvatar" />
     </div>
   );
