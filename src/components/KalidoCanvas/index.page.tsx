@@ -2,14 +2,7 @@ import styles from '@/styles/Home.module.css';
 import {useState, useEffect} from 'react';
 import * as THREE from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
-import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
-import {
-  VRM,
-  VRMExpressionPresetName,
-  VRMHumanBoneName,
-  VRMLoaderPlugin,
-  VRMUtils,
-} from '@pixiv/three-vrm';
+import {VRM, VRMExpressionPresetName, VRMHumanBoneName, VRMUtils} from '@pixiv/three-vrm';
 import * as Kalidokit from 'kalidokit';
 import {
   FACEMESH_TESSELATION,
@@ -35,7 +28,7 @@ interface HolisticResults {
 const clamp = Kalidokit.Utils.clamp;
 const lerp = Kalidokit.Vector.lerp;
 
-export default function KalidoCanvas() {
+export default function KalidoCanvas({currentVrm}: any) {
   const [cameraIsOn, setCameraIsOn] = useState(false);
   const [isDayTheme, setisDayTheme] = useState(true);
   const avatarBgImage = isDayTheme ? '/green-grass-field.jpg' : '/galaxy.jpg';
@@ -58,7 +51,7 @@ export default function KalidoCanvas() {
   // set up three.js once the canvas is loaded
   useEffect(() => {
     /* THREEJS WORLD SETUP */
-    let currentVrm: any;
+    if (!currentVrm) return;
     // scene
     const scene = new THREE.Scene();
     // camera
@@ -91,6 +84,8 @@ export default function KalidoCanvas() {
     // renderer.setClearColor(0xffea00);
     const textureLoader = new THREE.TextureLoader();
     scene.background = textureLoader.load(avatarBgImage);
+    scene.add(currentVrm.scene);
+    VRMUtils.rotateVRM0(currentVrm); // Rotate model 180deg to face camera
 
     // Main Render Loop
     const clock = new THREE.Clock();
@@ -105,31 +100,6 @@ export default function KalidoCanvas() {
     }
     animate();
 
-    /* VRM CHARACTER SETUP */
-    // Import Character VRM
-    const loader = new GLTFLoader();
-    loader.crossOrigin = 'anonymous';
-    // install plugin
-    loader.register(parser => {
-      return new VRMLoaderPlugin(parser);
-    });
-    // Import model from URL, add your own model here
-    loader.load(
-      'https://cdn.glitch.com/29e07830-2317-4b15-a044-135e73c7f840%2FAshtra.vrm?v=1630342336981',
-      gltf => {
-        VRMUtils.removeUnnecessaryJoints(gltf.scene);
-        const vrm = gltf.userData.vrm;
-        scene.add(vrm.scene);
-        console.log(vrm);
-        currentVrm = vrm;
-        VRMUtils.rotateVRM0(currentVrm); // Rotate model 180deg to face camera
-        return currentVrm;
-      },
-
-      progress => console.log('Loading model...', 100.0 * (progress.loaded / progress.total), '%'),
-      error => console.error(error),
-    );
-
     // Animate Rotation Helper function
     const rigRotation = (
       name: VRMHumanBoneName,
@@ -137,9 +107,6 @@ export default function KalidoCanvas() {
       dampener = 1,
       lerpAmount = 0.3,
     ) => {
-      if (!currentVrm) {
-        return;
-      }
       const Part = currentVrm.humanoid.getNormalizedBoneNode(name);
       if (!Part) {
         return;
@@ -161,9 +128,6 @@ export default function KalidoCanvas() {
       dampener = 1,
       lerpAmount = 0.3,
     ) => {
-      if (!currentVrm) {
-        return;
-      }
       const Part = currentVrm.humanoid.getNormalizedBoneNode(name);
       if (!Part) {
         return;
@@ -178,9 +142,6 @@ export default function KalidoCanvas() {
 
     let oldLookTarget = new THREE.Euler();
     const rigFace = (riggedFace: Kalidokit.TFace) => {
-      if (!currentVrm) {
-        return;
-      }
       rigRotation('neck', riggedFace.head, 0.7);
 
       // Blendshapes and Preset Name Schema
@@ -440,7 +401,7 @@ export default function KalidoCanvas() {
     } else {
       camera.stop();
     }
-  }, [avatarBgImage, cameraIsOn]);
+  }, [currentVrm, avatarBgImage, cameraIsOn]);
 
   return (
     <div className={`${styles.scene}`}>
