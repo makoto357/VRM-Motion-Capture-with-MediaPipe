@@ -1,5 +1,5 @@
 import React from 'react';
-import {Modal, ModalContent, ModalBody, ModalCloseButton, Text, Box} from '@chakra-ui/react';
+import {Modal, ModalContent, ModalBody, ModalCloseButton, Text, Box, Image} from '@chakra-ui/react';
 
 const InfoModal = ({useDisclosureFn}) => {
   const websiteTutorial = [
@@ -25,6 +25,7 @@ const InfoModal = ({useDisclosureFn}) => {
       isOpen={useDisclosureFn.isOpen}
       onClose={useDisclosureFn.onClose}
       motionPreset="slideInRight"
+      scrollBehavior="inside"
     >
       <ModalContent
         background="#dedede"
@@ -39,8 +40,14 @@ const InfoModal = ({useDisclosureFn}) => {
       >
         <ModalCloseButton borderRadius="50%" border="3px solid #808080" />
         <ModalBody m="54px 0px">
-          <Box display="flex" flexDir="column" h="100%" justifyContent="space-between">
-            <Box>
+          <Box
+            display="flex"
+            flexDir="column"
+            h="100%"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Box mb="30px">
               {websiteTutorial.map((w, index) => (
                 <>
                   <Box display="flex" gap="10px" mb="10px">
@@ -63,13 +70,7 @@ const InfoModal = ({useDisclosureFn}) => {
                 </>
               ))}
             </Box>
-            <Box
-              bgImage={`url("/website-logo.png")`}
-              bgSize="contain"
-              bgPosition="center"
-              bgRepeat="no-repeat"
-              h="50px"
-            />
+            <Image w="80%" h="auto" objectFit="cover" src="/website-logo.png" />
           </Box>
         </ModalBody>
       </ModalContent>

@@ -57,7 +57,7 @@ export default function Home() {
             h="100vh"
             w="100%"
           >
-            <Box w="150px" h="150px" mb="50px">
+            <Box boxSize={['75px', '150px']} mb="50px">
               <CircularProgressbar
                 value={progress}
                 text={`${progress}%`}
