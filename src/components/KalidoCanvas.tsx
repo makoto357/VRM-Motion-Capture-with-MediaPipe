@@ -1,4 +1,5 @@
 import styles from './KalidoCanvas.module.css';
+import {useDisclosure} from '@chakra-ui/react';
 import {useState, useEffect} from 'react';
 import * as THREE from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
@@ -16,6 +17,7 @@ import {drawConnectors, drawLandmarks, NormalizedLandmarkList} from '@mediapipe/
 import {useDrag} from '@use-gesture/react';
 import {useSpring, animated} from '@react-spring/web';
 import ToggleButton from './ToggleButton';
+import InfoModal from './InfoModal';
 
 interface HolisticResults {
   poseLandmarks?: NormalizedLandmarkList;
@@ -32,6 +34,7 @@ const lerp = Kalidokit.Vector.lerp;
 export default function KalidoCanvas({currentVrm}: any) {
   const [cameraIsOn, setCameraIsOn] = useState(false);
   const [isDayTheme, setisDayTheme] = useState(true);
+  const infoModal = useDisclosure();
   const avatarBgImage = isDayTheme ? '/green-grass-field.jpg' : '/galaxy.jpg';
   const avatarBgImageButton = isDayTheme ? '/galaxy.jpg' : '/green-grass-field.jpg';
   const cameraBgImageButton = cameraIsOn ? '/camera-off.svg' : '/camera-on.svg';
@@ -403,45 +406,49 @@ export default function KalidoCanvas({currentVrm}: any) {
   }, [currentVrm, avatarBgImage, cameraIsOn]);
 
   return (
-    <div className={`${styles.scene}`}>
-      {cameraIsOn && (
-        <animated.div
-          className={`${styles.draggableVideo}`}
-          style={{x, y, ...styles}}
-          {...bindDrag()}
-        >
-          <div className={`${styles.preview}`}>
-            <video
-              className={`${styles.video} input_video`}
-              width="1280px"
-              height="720px"
-              autoPlay
-              muted
-              playsInline
-            ></video>
-            <canvas className={`${styles.guide_canvas} guides`} />
-          </div>
-        </animated.div>
-      )}
-      <ToggleButton
-        onClickButton={() => setisDayTheme(prev => !prev)}
-        buttonRightPosition="48px"
-        bgImageSrc=""
-        bgImageUrl={avatarBgImageButton}
-      />
-      <ToggleButton
-        onClickButton={() => setisDayTheme(prev => !prev)}
-        buttonRightPosition="128px"
-        bgImageSrc=""
-        bgImageUrl={avatarBgImageButton}
-      />
-      <ToggleButton
-        onClickButton={() => setCameraIsOn(prev => !prev)}
-        buttonRightPosition="208px"
-        bgImageSrc={cameraBgImageButton}
-        bgImageUrl=""
-      />
-      <canvas id="myAvatar" />
-    </div>
+    <>
+      <div className={`${styles.scene}`}>
+        {cameraIsOn && (
+          <animated.div
+            className={`${styles.draggableVideo}`}
+            style={{x, y, ...styles}}
+            {...bindDrag()}
+          >
+            <div className={`${styles.preview}`}>
+              <video
+                className={`${styles.video} input_video`}
+                width="1280px"
+                height="720px"
+                autoPlay
+                muted
+                playsInline
+              ></video>
+              <canvas className={`${styles.guide_canvas} guides`} />
+            </div>
+          </animated.div>
+        )}
+
+        <ToggleButton
+          onClickButton={infoModal.isOpen ? infoModal.onClose : infoModal.onOpen}
+          buttonRightPosition="48px"
+          bgImageSrc="/question.png"
+          bgImageUrl=""
+        />
+        <ToggleButton
+          onClickButton={() => setisDayTheme(prev => !prev)}
+          buttonRightPosition="208px"
+          bgImageSrc=""
+          bgImageUrl={avatarBgImageButton}
+        />
+        <ToggleButton
+          onClickButton={() => setCameraIsOn(prev => !prev)}
+          buttonRightPosition="128px"
+          bgImageSrc={cameraBgImageButton}
+          bgImageUrl=""
+        />
+        <canvas id="myAvatar" />
+      </div>
+      <InfoModal useDisclosureFn={infoModal} />
+    </>
   );
 }
