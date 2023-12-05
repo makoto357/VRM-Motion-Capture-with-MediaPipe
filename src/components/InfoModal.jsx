@@ -37,6 +37,7 @@ const InfoModal = ({useDisclosureFn}) => {
         borderBottomRightRadius="20px"
         border="3px solid #808080"
         w="300px"
+        minHeight="100vh"
       >
         <ModalCloseButton borderRadius="50%" border="3px solid #808080" />
         <ModalBody m="54px 0px">
