@@ -1,5 +1,4 @@
-import styles from './KalidoCanvas.module.css';
-import {useDisclosure} from '@chakra-ui/react';
+import {useDisclosure, Box} from '@chakra-ui/react';
 import {useState, useEffect} from 'react';
 import * as THREE from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
@@ -407,24 +406,58 @@ export default function KalidoCanvas({currentVrm}: any) {
 
   return (
     <>
-      <div className={`${styles.scene}`}>
+      <Box position="relative" display="flex" flexDir="row">
         {cameraIsOn && (
           <animated.div
-            className={`${styles.draggableVideo}`}
-            style={{x, y, ...styles}}
+            style={{
+              x,
+              y,
+              position: 'relative',
+              willChange: 'transform',
+              borderRadius: '20px',
+              touchAction: 'none',
+              cursor: 'grab',
+            }}
             {...bindDrag()}
           >
-            <div className={`${styles.preview}`}>
+            <Box
+              display="flex"
+              flexDirection="column"
+              position="absolute"
+              top="16px"
+              left="16px"
+              overflow="hidden"
+              borderRadius="20px"
+              background="#222"
+              zIndex="200"
+            >
               <video
-                className={`${styles.video} input_video`}
+                className="input_video"
+                style={{
+                  maxWidth: '400px',
+                  height: 'auto',
+                  transform: 'scale(-1, 1)',
+                  borderRadius: '20px',
+                }}
                 width="1280px"
                 height="720px"
                 autoPlay
                 muted
                 playsInline
               ></video>
-              <canvas className={`${styles.guide_canvas} guides`} />
-            </div>
+              <canvas
+                className="guides"
+                style={{
+                  position: 'absolute',
+                  bottom: '0',
+                  left: '0',
+                  height: 'auto',
+                  width: '100%',
+                  zIndex: '1',
+                  transform: 'scale(-1, 1)',
+                }}
+              />
+            </Box>
           </animated.div>
         )}
 
@@ -447,7 +480,7 @@ export default function KalidoCanvas({currentVrm}: any) {
           bgImageUrl=""
         />
         <canvas id="myAvatar" />
-      </div>
+      </Box>
       <InfoModal useDisclosureFn={infoModal} />
     </>
   );
