@@ -1,38 +1,46 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+  <a href="https://github.com/github_username/repo_name">
+    <img src="../media/src/images/vrm-mocap-high-resolution-logo.png?raw=true" alt="Logo" width="120">
+  </a>
 
-## Getting Started
+<h3 align="center">VRM Mocap</h3>
 
-First, run the development server:
+  <p align="center">
+    A simple project of motion capture and avatar puppeteering!
+    <br />
+    <a href="https://vrm-mocap.vercel.app/"><strong>Website URL »</strong></a>
+    <br />
+  </p>
+</div>
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
+### Built With
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+* ![Next JS](https://img.shields.io/badge/Next-black?style=for-the-badge&logo=next.js&logoColor=white)
+* ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
+* ![Threejs](https://img.shields.io/badge/threejs-black?style=for-the-badge&logo=three.js&logoColor=white)
+* ![Chakra](https://img.shields.io/badge/chakra-%234ED1C5.svg?style=for-the-badge&logo=chakraui&logoColor=white)
+* ![Yarn](https://img.shields.io/badge/yarn-%232C8EBB.svg?style=for-the-badge&logo=yarn&logoColor=white)
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+Along with: 
+* [Google Mediapipe](https://developers.google.com/mediapipe) for motion capturing.
+* [KalidoKit](https://github.com/yeemachine/kalidokit) and [three-vrm](https://github.com/pixiv/three-vrm) for avatar puppeteering.
+* [react-spring](https://www.react-spring.dev/) and [use-gesture](https://use-gesture.netlify.app/) for creating draggable video.
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+## Feature
+* Upon entering the website, a loading screen will indicate the progress of loading the VRM file.
+<img width="1280" alt="loading-screen" src="../media/src/images/VRMmocap-loading-screen.png?raw=true">
+* You can toggle between two different backgrounds to experience a different feel for the avatar.
+<img width="1280" alt="loading-screen" src="../media/src/images/VRMmocap-avatar1.png?raw=true">
+* The video is draggable and can be moved around to prevent it from blocking the view.
+<img width="1280" alt="loading-screen" src="../media/src/images/VRMmocap-avatar2.png?raw=true">
+* There is also an infomation panel of the website features.
+<img height="400" alt="loading-screen" src="../media/src/images/VRMmocap-info-panel.png?raw=true">
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
-## Learn More
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
