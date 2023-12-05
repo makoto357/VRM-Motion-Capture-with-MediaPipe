@@ -37,6 +37,7 @@ export default function KalidoCanvas({currentVrm}: any) {
   const avatarBgImage = isDayTheme ? '/green-grass-field.jpg' : '/galaxy.jpg';
   const avatarBgImageButton = isDayTheme ? '/galaxy.jpg' : '/green-grass-field.jpg';
   const cameraBgImageButton = cameraIsOn ? '/camera-off.svg' : '/camera-on.svg';
+  const isSmallScreen = window.innerWidth <= 768;
 
   // make video draggable
   const [{x, y}, api] = useSpring(() => ({
@@ -438,6 +439,9 @@ export default function KalidoCanvas({currentVrm}: any) {
                   height: 'auto',
                   transform: 'scale(-1, 1)',
                   borderRadius: '20px',
+                  ...(isSmallScreen && {
+                    maxWidth: '160px',
+                  }),
                 }}
                 width="1280px"
                 height="720px"

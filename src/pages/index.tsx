@@ -46,8 +46,10 @@ export default function Home() {
       <main>
         {!currentVrm ? (
           <Box
+            background="#dedede"
             bgImage="url('/website-background-cover.png')"
-            backgroundSize="cover"
+            backgroundSize="contain"
+            bgRepeat="no-repeat"
             backgroundPosition="center"
             display="flex"
             justifyContent="center"
