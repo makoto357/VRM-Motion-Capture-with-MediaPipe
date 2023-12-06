@@ -22,8 +22,6 @@
 * ![Threejs](https://img.shields.io/badge/threejs-black?style=for-the-badge&logo=three.js&logoColor=white)
 * ![Chakra](https://img.shields.io/badge/chakra-%234ED1C5.svg?style=for-the-badge&logo=chakraui&logoColor=white)
 * ![Yarn](https://img.shields.io/badge/yarn-%232C8EBB.svg?style=for-the-badge&logo=yarn&logoColor=white)
-
-Along with: 
 * [Google Mediapipe](https://developers.google.com/mediapipe) for motion capturing.
 * [KalidoKit](https://github.com/yeemachine/kalidokit) and [three-vrm](https://github.com/pixiv/three-vrm) for avatar puppeteering.
 * [react-spring](https://www.react-spring.dev/) and [use-gesture](https://use-gesture.netlify.app/) for creating draggable video.
