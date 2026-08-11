@@ -33,6 +33,7 @@ const lerp = Kalidokit.Vector.lerp;
 export default function KalidoCanvas({currentVrm}: any) {
   const [cameraIsOn, setCameraIsOn] = useState(false);
   const [isTracking, setIsTracking] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
   const [isDayTheme, setisDayTheme] = useState(true);
   const infoModal = useDisclosure();
   const avatarBgImage = isDayTheme ? '/green-grass-field.jpg' : '/galaxy.jpg';
@@ -318,7 +319,14 @@ export default function KalidoCanvas({currentVrm}: any) {
     let videoElement = document.querySelector('.input_video') as HTMLVideoElement;
     let guideCanvas = document.querySelector('canvas.guides') as HTMLCanvasElement;
 
+    let startupTimeout: number | undefined;
+    let isCancelled = false;
+
     const onResults = (results: HolisticResults) => {
+      if (startupTimeout) {
+        window.clearTimeout(startupTimeout);
+      }
+      setCameraError(null);
       setIsTracking(true);
       console.log(results);
       drawResults(results);
@@ -398,13 +406,26 @@ export default function KalidoCanvas({currentVrm}: any) {
     });
 
     if (cameraIsOn) {
+      setCameraError(null);
       setIsTracking(false);
-      camera.start();
+      startupTimeout = window.setTimeout(() => {
+        setCameraError('Camera is taking longer than expected. Check permissions and try again.');
+      }, 10000);
+      camera.start().catch(error => {
+        if (!isCancelled) {
+          console.error('Unable to start camera', error);
+          window.clearTimeout(startupTimeout);
+          setCameraError('Unable to start camera. Check permissions and try again.');
+        }
+      });
       return () => {
+        isCancelled = true;
+        window.clearTimeout(startupTimeout);
         camera.stop();
       };
     } else {
       setIsTracking(false);
+      setCameraError(null);
       camera.stop();
     }
   }, [currentVrm, avatarBgImage, cameraIsOn]);
@@ -479,8 +500,10 @@ export default function KalidoCanvas({currentVrm}: any) {
                 background="blackAlpha.700"
                 color="white"
               >
-                {!isTracking && <Spinner size="sm" />}
-                <Text fontSize="sm">{isTracking ? 'Tracking active' : 'Starting camera…'}</Text>
+                {!isTracking && !cameraError && <Spinner size="sm" />}
+                <Text fontSize="sm" aria-live="polite">
+                  {cameraError ?? (isTracking ? 'Tracking active' : 'Starting camera…')}
+                </Text>
               </Box>
             </Box>
           </animated.div>
@@ -491,12 +514,14 @@ export default function KalidoCanvas({currentVrm}: any) {
           buttonRightPosition="48px"
           bgImageSrc="/question.png"
           bgImageUrl=""
+          buttonLabel={infoModal.isOpen ? 'Close help' : 'Open help'}
         />
         <ToggleButton
           onClickButton={() => setisDayTheme(prev => !prev)}
           buttonRightPosition="208px"
           bgImageSrc=""
           bgImageUrl={avatarBgImageButton}
+          buttonLabel="Switch avatar background"
         />
         <ToggleButton
           onClickButton={() => {
@@ -506,6 +531,7 @@ export default function KalidoCanvas({currentVrm}: any) {
           buttonRightPosition="128px"
           bgImageSrc={cameraBgImageButton}
           bgImageUrl=""
+          buttonLabel={cameraIsOn ? 'Turn camera off' : 'Turn camera on'}
         />
         <canvas id="myAvatar" />
       </Box>

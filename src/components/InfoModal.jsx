@@ -71,7 +71,13 @@ const InfoModal = ({useDisclosureFn}) => {
                 </>
               ))}
             </Box>
-            <Image w="80%" h="auto" objectFit="cover" src="/website-logo.png" />
+            <Image
+              w="80%"
+              h="auto"
+              objectFit="cover"
+              src="/website-logo.png"
+              alt="VRM Motion Capture tutorial logo"
+            />
           </Box>
         </ModalBody>
       </ModalContent>

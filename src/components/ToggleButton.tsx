@@ -6,6 +6,7 @@ interface ToggleButtonProps {
   buttonRightPosition: string;
   bgImageSrc: string;
   bgImageUrl: string;
+  buttonLabel: string;
 }
 
 const ToggleButton: React.FC<ToggleButtonProps> = ({
@@ -13,6 +14,7 @@ const ToggleButton: React.FC<ToggleButtonProps> = ({
   buttonRightPosition,
   bgImageSrc,
   bgImageUrl,
+  buttonLabel,
 }) => {
   return (
     <button
@@ -23,10 +25,11 @@ const ToggleButton: React.FC<ToggleButtonProps> = ({
         backgroundImage: `url(${bgImageUrl})`,
       }}
       onClick={onClickButton}
+      aria-label={buttonLabel}
     >
       {bgImageSrc && (
         <Box p="5px">
-          <Image src={bgImageSrc} w="30px" h="30px" />
+          <Image src={bgImageSrc} alt="" w="30px" h="30px" />
         </Box>
       )}
     </button>
