@@ -1,4 +1,4 @@
-import {useDisclosure, Box} from '@chakra-ui/react';
+import {useDisclosure, Box, Spinner, Text} from '@chakra-ui/react';
 import {useState, useEffect} from 'react';
 import * as THREE from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
@@ -32,6 +32,7 @@ const lerp = Kalidokit.Vector.lerp;
 
 export default function KalidoCanvas({currentVrm}: any) {
   const [cameraIsOn, setCameraIsOn] = useState(false);
+  const [isTracking, setIsTracking] = useState(false);
   const [isDayTheme, setisDayTheme] = useState(true);
   const infoModal = useDisclosure();
   const avatarBgImage = isDayTheme ? '/green-grass-field.jpg' : '/galaxy.jpg';
@@ -318,6 +319,7 @@ export default function KalidoCanvas({currentVrm}: any) {
     let guideCanvas = document.querySelector('canvas.guides') as HTMLCanvasElement;
 
     const onResults = (results: HolisticResults) => {
+      setIsTracking(true);
       console.log(results);
       drawResults(results);
       // Animate model
@@ -396,11 +398,13 @@ export default function KalidoCanvas({currentVrm}: any) {
     });
 
     if (cameraIsOn) {
+      setIsTracking(false);
       camera.start();
       return () => {
         camera.stop();
       };
     } else {
+      setIsTracking(false);
       camera.stop();
     }
   }, [currentVrm, avatarBgImage, cameraIsOn]);
@@ -461,6 +465,23 @@ export default function KalidoCanvas({currentVrm}: any) {
                   transform: 'scale(-1, 1)',
                 }}
               />
+              <Box
+                position="absolute"
+                top="12px"
+                right="12px"
+                zIndex="2"
+                display="flex"
+                alignItems="center"
+                gap="8px"
+                px="10px"
+                py="6px"
+                borderRadius="full"
+                background="blackAlpha.700"
+                color="white"
+              >
+                {!isTracking && <Spinner size="sm" />}
+                <Text fontSize="sm">{isTracking ? 'Tracking active' : 'Starting camera…'}</Text>
+              </Box>
             </Box>
           </animated.div>
         )}
@@ -478,7 +499,10 @@ export default function KalidoCanvas({currentVrm}: any) {
           bgImageUrl={avatarBgImageButton}
         />
         <ToggleButton
-          onClickButton={() => setCameraIsOn(prev => !prev)}
+          onClickButton={() => {
+            setIsTracking(false);
+            setCameraIsOn(prev => !prev);
+          }}
           buttonRightPosition="128px"
           bgImageSrc={cameraBgImageButton}
           bgImageUrl=""
